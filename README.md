@@ -1,11 +1,26 @@
+CLEAN AP – Smart Cleanliness Monitoring System
+Project Description
+CLEAN AP is a smart web-based application developed to promote cleanliness and environmental awareness.
+The system allows users to report cleanliness issues and helps authorities monitor and manage public sanitation efficiently.
 
-  # Interactive Waste Management Prototype
+This project aims to support a clean and sustainable environment using modern web technologies.
 
-  This is a code bundle for Interactive Waste Management Prototype. The original project is available at https://www.figma.com/design/a6oDZX5QyqP6zmcA4mXHi9/Interactive-Waste-Management-Prototype.
-
-  ## Running the code
-
-  Run `npm i` to install the dependencies.
-
-  Run `npm run dev` to start the development server.
-  
+Features
+Report cleanliness issues
+Location-based complaint submission
+Monitoring and management system
+User-friendly web interface
+Firebase backend integration
+Fast and responsive design
+Technologies Used
+Frontend
+HTML
+CSS
+JavaScript
+Vite
+Backend
+Firebase
+Firestore Database
+Firebase Hosting
+Project Structure
+CLEAN AP PROJECT │ ├── FRONTEND/ │ ├── index.html │ ├── package.json │ ├── vite.config.ts │ ├── Clean-AP backend/ │ ├── firebase.json │ ├── firestore.rules │ ├── package.json │ └── Documentation Files
