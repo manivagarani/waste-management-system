@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- HELPER FUNCTION ---
+    // Function to retrieve the user's role from the 'users' collection.
+    // This is used to verify permissions.
+    function getUserRole(userId) {
+      return get(/databases/$(database)/documents/users/$(userId)).data.role;
+    }
+
+    // --- USERS COLLECTION ---
+    // Users can read their own profile.
+    // Only 'admin' can read everyone's profile or edit user details.
+    match /users/{userId} {
+      allow read: if request.auth.uid == userId || getUserRole(request.auth.uid) == 'admin';
+      allow write: if getUserRole(request.auth.uid) == 'admin'; 
+    }
+    
+    // --- DUSTBIN REQUESTS ---
+    // Read: Any authenticated user can view requests.
+    // Create: Only a 'citizen' can create a new request.
+    // Update: Only 'village_staff' assigned to this request can update it (e.g., changing status).
+    match /dustbin_requests/{docId} {
+      allow read: if request.auth != null; 
+      allow create: if getUserRole(request.auth.uid) == 'citizen';
+      allow update: if getUserRole(request.auth.uid) == 'village_staff' 
+                      && resource.data.assignedVillageStaffId == request.auth.uid;
+    }
+    
+    // --- COMPLAINTS ---
+    // Read: Any authenticated user can view complaints.
+    // Create: Only a 'citizen' can file a complaint.
+    // Update: Only 'cleaning_staff' assigned to this task can update it.
+    match /complaints/{docId} {
+       allow read: if request.auth != null;
+       allow create: if getUserRole(request.auth.uid) == 'citizen';
+       allow update: if getUserRole(request.auth.uid) == 'cleaning_staff' 
+                       && resource.data.assignedCleaningStaffId == request.auth.uid;
+    }
+
+    // --- RATINGS ---
+    // Read: Only 'admin' can view all ratings.
+    // Create: Only a 'citizen' can submit a rating.
+    match /ratings/{docId} {
+      allow read: if getUserRole(request.auth.uid) == 'admin';
+      allow create: if getUserRole(request.auth.uid) == 'citizen';
+    }
+    
+    // --- ISSUES ---
+    // Read: Only 'admin' can view reported issues.
+    // Create: Only a 'citizen' can report an issue.
+    // Update: Only 'admin' can update/resolve issues.
+    match /issues/{docId} {
+      allow read: if getUserRole(request.auth.uid) == 'admin';
+      allow create: if getUserRole(request.auth.uid) == 'citizen';
+      allow update: if getUserRole(request.auth.uid) == 'admin';
+    }
+    
+    // --- ADMIN ACCESS ---
+    // Admins have full read/write access to all collections in the database.
+    match /{document=**} {
+      allow read, write: if getUserRole(request.auth.uid) == 'admin';
+    }
+  }
+}
